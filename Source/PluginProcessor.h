@@ -59,12 +59,15 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
+    void updateFilter();
+
     AudioProcessorValueTreeState tree;
 
 private:
     Synthesiser mySynth;
     SynthVoice* myVoice;
-    
+    dsp::ProcessorDuplicator<dsp::StateVariableFilter::Filter<float>, dsp::StateVariableFilter::Parameters<float>> stateVariableFilter;
+
     double lastSampleRate;
     
     //==============================================================================
