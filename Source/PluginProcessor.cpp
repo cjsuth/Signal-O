@@ -39,16 +39,17 @@ tree (*this, nullptr, "PARAMETERS", createParameterLayout())
 //converting from real attack value to decimal between 0 and 1
 float customConvertTo0To1Func(float rangeStart, float rangeEnd, float valueToRemap)
 {
-    
-//    const midpoint
-//
-//    auto proportion = (valueToRemap - rangeStart) / (rangeEnd - rangeStart);
-//    auto clampedProportion = jlimit (0.0f, 1.0f, proportion);
-//
-//    if (clampedProportion < .5) {
-//        return
+
+//     const midpoint;
+
+//     auto proportion = (valueToRemap - rangeStart) / (rangeEnd - rangeStart);
+//     auto clampedProportion = jlimit(0.0f, 1.0f, proportion);
+
+//     if (clampedProportion < .5)
+//     {
+//         return
 //    }
-//
+
 //    auto skew = std::log (.5) / std::log ((midpoint - min) / (max - min));
 //    return std::pow (clampedProportion, skew);
     return 1;
@@ -57,7 +58,7 @@ float customConvertTo0To1Func(float rangeStart, float rangeEnd, float valueToRem
 //converting from a decimal between 0 and 1 to a real attack value
 float customConvertFrom0To1Func(float rangeStart, float rangeEnd, float valueToRemap)
 {
-    
+
     float firstMax = 100.0f;
 
     if (valueToRemap <= .5) {
@@ -73,25 +74,47 @@ float customConvertFrom0To1Func(float rangeStart, float rangeEnd, float valueToR
 AudioProcessorValueTreeState::ParameterLayout BasicSynthAudioProcessor::createParameterLayout()
 {
     std::vector<std::unique_ptr<juce::AudioProcessorValueTreeState::Parameter>> layout;
+
+    // NormalisableRange<float> attackRange(0, 20000.0f, customConvertFrom0To1Func, customConvertTo0To1Func);
+    NormalisableRange<float> attackRange(0, 20000.0f);
+    attackRange.setSkewForCentre(50.0);
+    auto attackParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                        ("attack", "Attack", "Attack", attackRange, 0.0f, nullptr, nullptr);
+                        
+
+    NormalisableRange<float> decayRange(0, 60000.0f);
+    decayRange.setSkewForCentre(300.0);
+    auto decayParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                        ("decay", "Decay", "Decay", decayRange, 600.0f, nullptr, nullptr);
+                        
+
+    NormalisableRange<float> sustainRange(0, 1.0f, .01f, 1);
+    auto sustainParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                        ("sustain", "Sustain", "Sustain", sustainRange, 1.0, nullptr, nullptr);
+                        
+
+    NormalisableRange<float> releaseRange(0, 60000.0f);
+    releaseRange.setSkewForCentre(300.0);                    
+    auto releaseParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                        ("release", "Release", "Release", releaseRange, 50.0f, nullptr, nullptr);
     
-    NormalisableRange<float> attackRange(0, 20000.0f, customConvertFrom0To1Func, customConvertTo0To1Func);
-    
-    NormalisableRange<float> decayRange(0, 60000.0f, .001f);
-    decayRange.setSkewForCentre(1000.0);
-    
-    NormalisableRange<float> releaseRange(0, 60000.0f, .001f);
-    releaseRange.setSkewForCentre(1000.0);
-      
- 
-    auto attackParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> ("attack", "Attack", "Attack", attackRange, 0, nullptr, nullptr);
-    auto decayParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> ("decay", "Decay", "Decay", decayRange, 600.0f, nullptr, nullptr);
-    auto sustainParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> ("sustain", "Sustain", "Sustain", NormalisableRange<float>(0, 1.0f, .01f, 1), 1.0, nullptr, nullptr);
-    auto releaseParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> ("release", "Release", "Release", releaseRange, 2000.0f, nullptr, nullptr);
-    auto wavetypeParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> ("wavetype", "Wavetype", "Wavetype", NormalisableRange<float>(1, 4), 1, nullptr, nullptr);
-    auto filtertypeParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> ("filtertype", "Filtertype", "Filtertype", NormalisableRange<float>(1, 3), 1, nullptr, nullptr);
-    auto cutoffParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> ("cutoff", "Cutoff", "Cutoff", NormalisableRange<float>(26.0f, 20000.0f), 400.0f, nullptr, nullptr);
-    auto resParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> ("res", "Res", "Res", NormalisableRange<float>(0.0f, 100.0f), 0.0f, nullptr, nullptr);
-    
+
+    auto wavetypeParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                            ("wavetype", "Wavetype", "Wavetype", NormalisableRange<float>(1, 4), 1, nullptr, nullptr);
+                            
+
+    auto filtertypeParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                            ("filterType", "Filtertype", "Filtertype", NormalisableRange<float>(0.0f, 2.0f), 0.0f, nullptr, nullptr);
+
+    NormalisableRange<float> cutoffRange(20.0f, 10000.0f);
+    cutoffRange.setSkewForCentre(1000.0);                          
+    auto cutoffParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                            ("filterCutoff", "Cutoff", "Cutoff", cutoffRange, 400.0f, nullptr, nullptr);
+                            
+    auto resParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                            ("filterRes", "Res", "Res", NormalisableRange<float>(1.0f, 5.0f), 1.0f, nullptr, nullptr);
+
+
     layout.push_back(std::move(attackParam));
     layout.push_back(std::move(decayParam));
     layout.push_back(std::move(sustainParam));
@@ -176,7 +199,15 @@ void BasicSynthAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     ignoreUnused(samplesPerBlock);
     lastSampleRate = sampleRate;
     mySynth.setCurrentPlaybackSampleRate(lastSampleRate);
-    
+
+    dsp::ProcessSpec spec;
+    spec.sampleRate = lastSampleRate;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = getTotalNumOutputChannels();
+
+    stateVariableFilter.reset();
+    stateVariableFilter.prepare(spec);
+    updateFilter();
 }
 
 void BasicSynthAudioProcessor::releaseResources()
@@ -209,6 +240,21 @@ bool BasicSynthAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 }
 #endif
 
+void BasicSynthAudioProcessor::updateFilter()
+{
+    int menuChoice = *tree.getRawParameterValue("filterType");
+    float freq = *tree.getRawParameterValue("filterCutoff");
+    float res = *tree.getRawParameterValue("filterRes");
+
+    switch (menuChoice) {
+        case 0: stateVariableFilter.state->type = dsp::StateVariableFilter::Parameters<float>::Type::lowPass; break;
+        case 1: stateVariableFilter.state->type = dsp::StateVariableFilter::Parameters<float>::Type::highPass; break;
+        case 2: stateVariableFilter.state->type = dsp::StateVariableFilter::Parameters<float>::Type::bandPass; break;
+    }
+
+    stateVariableFilter.state->setCutOffFrequency(lastSampleRate, freq, res);
+}
+
 void BasicSynthAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
     
@@ -223,9 +269,9 @@ void BasicSynthAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuf
             
             myVoice->getWavetypeParam(tree.getRawParameterValue("wavetype"));
             
-            myVoice->getFilterParams(tree.getRawParameterValue("filtertype"),
-                                     tree.getRawParameterValue("cutoff"),
-                                     tree.getRawParameterValue("res"));
+            myVoice->getFilterParams(tree.getRawParameterValue("filterType"),
+                                     tree.getRawParameterValue("filterCutoff"),
+                                     tree.getRawParameterValue("filterRes"));
 
         }
     }
@@ -234,6 +280,9 @@ void BasicSynthAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuf
 
     // send to synth
     mySynth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    updateFilter();
+    dsp::AudioBlock<float> block(buffer);
+    stateVariableFilter.process(dsp::ProcessContextReplacing<float>(block));
 }
 
 //==============================================================================
