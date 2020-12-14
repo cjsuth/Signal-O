@@ -20,7 +20,7 @@ Envelope::Envelope(BasicSynthAudioProcessor& p) :
     
     //attackKnob config
     attackKnob.setLookAndFeel(&customLookAndFeel);
-    attackKnob.setSliderStyle(Slider::Rotary);
+    attackKnob.setSliderStyle(Slider::RotaryVerticalDrag);
     attackKnob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
     //attackKnob.setSize(knobWidth, ctrlBoxHeight);
     attackLabel.setText("Attack", dontSendNotification);
@@ -34,7 +34,7 @@ Envelope::Envelope(BasicSynthAudioProcessor& p) :
     
     //decayKnob config
     decayKnob.setLookAndFeel(&customLookAndFeel);
-    decayKnob.setSliderStyle(Slider::Rotary);
+    decayKnob.setSliderStyle(Slider::RotaryVerticalDrag);
     decayKnob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
     //decayKnob.setSize(knobWidth, ctrlBoxHeight);
     decayLabel.setText ("Decay", dontSendNotification);
@@ -48,7 +48,7 @@ Envelope::Envelope(BasicSynthAudioProcessor& p) :
 
     //sustainKnob config
     sustainKnob.setLookAndFeel(&customLookAndFeel);
-    sustainKnob.setSliderStyle(Slider::Rotary);
+    sustainKnob.setSliderStyle(Slider::RotaryVerticalDrag);
     sustainKnob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
     //sustainKnob.setSize(knobWidth, ctrlBoxHeight);
     sustainLabel.setText ("Sustain", dontSendNotification);
@@ -62,7 +62,7 @@ Envelope::Envelope(BasicSynthAudioProcessor& p) :
     
     //releaseKnob config
     releaseKnob.setLookAndFeel(&customLookAndFeel);
-    releaseKnob.setSliderStyle(Slider::Rotary);
+    releaseKnob.setSliderStyle(Slider::RotaryVerticalDrag);
     releaseKnob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
     //releaseKnob.setSize(knobWidth, ctrlBoxHeight);
     releaseLabel.setText ("Release", dontSendNotification);
@@ -115,14 +115,6 @@ void Envelope::paint (Graphics& g)
 
 void Envelope::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
-    
-    // env height is 200
-    // border is 16
-    // drawable space should then be 168
-    // ctrl box is 80
-    //
 
     Rectangle<int> area = getLocalBounds().reduced(border);
 
