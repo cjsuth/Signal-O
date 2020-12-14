@@ -25,15 +25,7 @@ EnvelopeModel::~EnvelopeModel()
 }
 
 void EnvelopeModel::updateNodes(float attack, float decay, float sustain, float release)
-{
-    //        auto clampedValue = jlimit (static_cast<ValueType> (0), static_cast<ValueType> (1), value);
-    //        auto proportion = clampTo0To1 ((v - start) / (end - start));
-    // skew = std::log (static_cast<ValueType> (0.5)) / std::log ((centrePointValue - start) / (end - start));
-    //            return std::pow (proportion, skew);
-    
-
-    
-    
+{    
     auto maxWidth = (getWidth() - border) / 3;
     auto maxHeight = getHeight() - (border * 2);
 
@@ -48,7 +40,6 @@ void EnvelopeModel::updateNodes(float attack, float decay, float sustain, float 
     
     drawLines();
     repaint();
-    //triggerAsyncUpdate();
 }
 
 float EnvelopeModel::getSkewedPosition(float value, float min, float midpoint, float max)
