@@ -30,7 +30,7 @@ public:
 
 private:
     const int ctrlBoxHeight = 80;
-    const int border = 16;
+    const int border = 8;
     
     BasicSynthAudioProcessor& processor;
     CustomLookAndFeel customLookAndFeel;
@@ -38,6 +38,7 @@ private:
     //EnvelopeModel envModel;
     
     ComboBox filterMenu;
+    Label filterLabel;
     HZKnob cutoffKnob;
     Label cutoffLabel;
     Slider resKnob;
