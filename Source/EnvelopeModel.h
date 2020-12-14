@@ -10,7 +10,6 @@
 
 #pragma once
 #include <JuceHeader.h>
-//#include "Envelope.h"
 
 class EnvelopeModel : public Component
 {
@@ -26,7 +25,7 @@ public:
     void drawLines();
 
 private:
-    int border = 4;
+    int border = 10;
     
     Point<float> attackNode;
     Point<float> decayNode;
