@@ -27,6 +27,7 @@ public:
         env1.setDecay(*decay);
         env1.setSustain(*sustain);
         env1.setRelease(*release);
+        
     }
     
     void getWavetypeParam (std::atomic<float>* wave)
@@ -34,21 +35,21 @@ public:
         wavetype = (int)*wave;
     }
     
-    void getFilterParams (std::atomic<float>* filter, std::atomic<float>* c, std::atomic<float>* r)
+    void getFilterParams (std::atomic<float>* filterType, std::atomic<float>* filterCutoff, std::atomic<float>* filterRes)
     {
-        filtertype = (int)*filter;
-        cutoff = (int)*c;
-        res = (int)*r;
+        filterChoice = (int)*filterType;
+        cutoff = (int)*filterCutoff;
+        res = (int)*filterRes;
     }
     
-    void startNote (int midiNoteNumber, float velocity, SynthesiserSound *sound, int currentPitchWheelPosition)
+    void startNote (int midiNoteNumber, float velocity, SynthesiserSound *sound, int currentPitchWheelPosition) override
     {
         env1.trigger = 1;
-        level = velocity;
+        level = velocity * .8;
         frequency = MidiMessage::getMidiNoteInHertz(midiNoteNumber);
     }
     
-    void stopNote (float velocity, bool allowTailOff)
+    void stopNote (float velocity, bool allowTailOff) override
     {
         env1.trigger = 0;
         allowTailOff = true;
@@ -56,35 +57,35 @@ public:
         if (velocity == 0)
             clearCurrentNote();
     }
+
+    double setOscType()
+    {
+        double sample1;
+
+        switch(wavetype) {
+            case 1: sample1 = osc1.sinewave(frequency); break;
+            case 2: sample1 = osc1.triangle(frequency); break;
+            case 3: sample1 = osc1.saw(frequency); break;
+            case 4: sample1 = osc1.square(frequency); break;
+            default: sample1 = osc1.sinewave(frequency);
+        }
+
+        return sample1;
+    }
+
+    double setEnvelope()
+    {
+        return env1.adsr(setOscType(), env1.trigger);
+    }
     
     // like processBlock, DSP stuff here
-    void renderNextBlock (AudioBuffer<float> &outputBuffer, int startSample, int numSamples)
+    void renderNextBlock (AudioBuffer<float> &outputBuffer, int startSample, int numSamples) override
     {
         for (int sample = 0; sample < numSamples; ++sample)
-        {
-            double theWave;
-            double filteredSound;
-            
-            switch (wavetype) {
-                case 1: theWave = osc1.sinewave(frequency) * level; break;
-                case 2: theWave = osc1.triangle(frequency) * level; break;
-                case 3: theWave = osc1.saw(frequency) * level; break;
-                case 4: theWave = osc1.square(frequency) * level; break;
-                default: theWave = osc1.sinewave(frequency) * level;
-            }
-            
-            double theSound = env1.adsr(theWave, env1.trigger) * level;
-            
-            switch (filtertype) {
-                case 1: filteredSound = filter1.lores(theSound, cutoff, res); break;
-                case 2: filteredSound = filter1.hires(theSound, cutoff, res); break;
-                case 3: filteredSound = filter1.bandpass(theSound, cutoff, res); break;
-                default: filteredSound = filter1.lores(theSound, cutoff, res);
-            }
-            
+        {  
             for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
             {
-                outputBuffer.addSample(channel, startSample, filteredSound);
+                outputBuffer.addSample(channel, startSample, setEnvelope() * level);
             }
             ++startSample;
         }
@@ -103,7 +104,9 @@ private:
     double level;
     double frequency;
     int wavetype;
-    int filtertype;
+    int theWave;
+
+    int filterChoice;
     float cutoff;
     float res;
     
