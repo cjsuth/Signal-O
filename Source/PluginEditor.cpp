@@ -16,10 +16,10 @@ BasicSynthAudioProcessorEditor::BasicSynthAudioProcessorEditor (BasicSynthAudioP
 : AudioProcessorEditor (&p), processor (p), envGUI(p), oscGUI(p), filterGUI(p)
 {
     setOpaque (true);
-    setSize (800, 600);
-    
-    addAndMakeVisible(&envGUI);
+    setSize (248, 512);
+
     addAndMakeVisible(&oscGUI);
+    addAndMakeVisible(&envGUI);
     addAndMakeVisible(&filterGUI);
 }
 
@@ -38,7 +38,9 @@ void BasicSynthAudioProcessorEditor::resized()
     auto border = 4;
     auto area = getLocalBounds().reduced(border);
 
-    envGUI.setBounds(area.removeFromTop(envGUI.getHeight()).removeFromLeft(envGUI.getWidth()));
     oscGUI.setBounds(area.removeFromTop(oscGUI.getHeight()).removeFromLeft(oscGUI.getWidth()));
+    area.removeFromTop(border);
+    envGUI.setBounds(area.removeFromTop(envGUI.getHeight()).removeFromLeft(envGUI.getWidth()));
+    area.removeFromTop(border);
     filterGUI.setBounds(area.removeFromTop(filterGUI.getHeight()).removeFromLeft(filterGUI.getWidth()));
 }
