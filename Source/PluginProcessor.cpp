@@ -99,9 +99,12 @@ AudioProcessorValueTreeState::ParameterLayout BasicSynthAudioProcessor::createPa
                         ("release", "Release", "Release", releaseRange, 50.0f, nullptr, nullptr);
     
 
-    auto wavetypeParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
-                            ("wavetype", "Wavetype", "Wavetype", NormalisableRange<float>(1, 4), 1, nullptr, nullptr);
-                            
+    auto wavetype1Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                            ("wavetype1", "Wavetype1", "Wavetype1", NormalisableRange<float>(1, 4), 1, nullptr, nullptr);
+    auto wavetype2Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                            ("wavetype2", "Wavetype2", "Wavetype2", NormalisableRange<float>(1, 4), 1, nullptr, nullptr);    
+    auto blendParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                            ("blend", "Blend", "Blend", NormalisableRange<float>(0.0f, 1.0f), 0.0f, nullptr, nullptr);                              
 
     auto filtertypeParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
                             ("filterType", "Filtertype", "Filtertype", NormalisableRange<float>(0.0f, 2.0f), 0.0f, nullptr, nullptr);
@@ -119,7 +122,9 @@ AudioProcessorValueTreeState::ParameterLayout BasicSynthAudioProcessor::createPa
     layout.push_back(std::move(decayParam));
     layout.push_back(std::move(sustainParam));
     layout.push_back(std::move(releaseParam));
-    layout.push_back(std::move(wavetypeParam));
+    layout.push_back(std::move(wavetype1Param));
+    layout.push_back(std::move(wavetype2Param));
+    layout.push_back(std::move(blendParam));
     layout.push_back(std::move(filtertypeParam));
     layout.push_back(std::move(cutoffParam));
     layout.push_back(std::move(resParam));
@@ -267,7 +272,9 @@ void BasicSynthAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuf
                                      tree.getRawParameterValue("sustain"),
                                      tree.getRawParameterValue("release"));
             
-            myVoice->getWavetypeParam(tree.getRawParameterValue("wavetype"));
+            myVoice->getWavetypeParams(tree.getRawParameterValue("wavetype1"),
+                                       tree.getRawParameterValue("wavetype2"),
+                                       tree.getRawParameterValue("blend"));
             
             myVoice->getFilterParams(tree.getRawParameterValue("filterType"),
                                      tree.getRawParameterValue("filterCutoff"),

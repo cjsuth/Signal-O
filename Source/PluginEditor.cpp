@@ -16,7 +16,7 @@ BasicSynthAudioProcessorEditor::BasicSynthAudioProcessorEditor (BasicSynthAudioP
 : AudioProcessorEditor (&p), processor (p), envGUI(p), oscGUI(p), filterGUI(p)
 {
     setOpaque (true);
-    setSize (248, 512);
+    setSize (488, 512);
 
     addAndMakeVisible(&oscGUI);
     addAndMakeVisible(&envGUI);

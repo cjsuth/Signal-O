@@ -30,9 +30,11 @@ public:
         
     }
     
-    void getWavetypeParam (std::atomic<float>* wave)
+    void getWavetypeParams(std::atomic<float>* wave1, std::atomic<float>* wave2, std::atomic<float>* blend)
     {
-        wavetype = (int)*wave;
+        wavetype1 = (int)*wave1;
+        wavetype2 = (int)*wave2;
+        oscBlend = *blend;
     }
     
     void getFilterParams (std::atomic<float>* filterType, std::atomic<float>* filterCutoff, std::atomic<float>* filterRes)
@@ -60,17 +62,27 @@ public:
 
     double setOscType()
     {
-        double sample1;
-
-        switch(wavetype) {
+        double sample1, sample2;
+        
+        switch (wavetype1)
+        {
             case 1: sample1 = osc1.sinewave(frequency); break;
             case 2: sample1 = osc1.triangle(frequency); break;
             case 3: sample1 = osc1.saw(frequency); break;
             case 4: sample1 = osc1.square(frequency); break;
             default: sample1 = osc1.sinewave(frequency);
         }
-
-        return sample1;
+        
+        switch (wavetype2)
+        {
+            case 1: sample2 = osc2.sinewave(frequency / 2.0); break;
+            case 2: sample2 = osc2.triangle(frequency / 2.0); break;
+            case 3: sample2 = osc2.saw(frequency / 2.0); break;
+            case 4: sample2 = osc2.square(frequency / 2.0); break;
+            default: sample2 = osc2.sinewave(frequency / 2.0);
+        }
+        
+        return sample1 + oscBlend * sample2;
     }
 
     double setEnvelope()
@@ -103,14 +115,16 @@ public:
 private:
     double level;
     double frequency;
-    int wavetype;
-    int theWave;
+    int wavetype1;
+    int wavetype2;
+    float oscBlend;
 
     int filterChoice;
     float cutoff;
     float res;
     
     maxiOsc osc1;
+    maxiOsc osc2;
     maxiEnv env1;
     maxiFilter filter1;
 };

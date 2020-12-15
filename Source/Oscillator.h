@@ -13,11 +13,12 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "OscModel.h"
+#include "CustomLookAndFeel.h"
 
 //==============================================================================
 /*
 */
-class Oscillator    : public Component, ComboBox::Listener
+class Oscillator    : public Component, ComboBox::Listener, Slider::Listener
 {
 public:
     Oscillator(BasicSynthAudioProcessor&);
@@ -26,16 +27,27 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     void comboBoxChanged(ComboBox *) override;
+    void sliderValueChanged(Slider *slider) override;
+    float getBlend();
 
   private:
     const int border = 8;
     BasicSynthAudioProcessor& processor;
+    CustomLookAndFeel customLookAndFeel;
 
-    ComboBox oscMenu;
-    OscModel oscModel;
+    ComboBox osc1Menu;
+    OscModel osc1Model;
+
+    ComboBox osc2Menu;
+    OscModel osc2Model;
+
     Label oscLabel;
 
-    std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> oscMenuAttachment;
-    
+    Slider blendKnob;
+    Label blendLabel;
+
+    std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> osc1MenuAttachment;
+    std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> osc2MenuAttachment;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> blendAttachment;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Oscillator)
 };

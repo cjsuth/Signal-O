@@ -13,35 +13,77 @@
 
 //==============================================================================
 Oscillator::Oscillator(BasicSynthAudioProcessor& p) :
-    processor(p), oscModel(1)
+    processor(p), osc1Model(1), osc2Model(1)
 {
     setOpaque(true);
-    setSize(240, 160);
+    setSize(480, 160);
 
-    oscMenu.addItem("Sine", 1);
-    oscMenu.addItem("Triangle", 2);
-    oscMenu.addItem("Saw", 3);
-    oscMenu.addItem("Square", 4);
+    osc1Menu.addItem("Sine", 1);
+    osc1Menu.addItem("Triangle", 2);
+    osc1Menu.addItem("Saw", 3);
+    osc1Menu.addItem("Square", 4);
 
-    oscMenu.setJustificationType(Justification::centred);
-    oscMenu.setSelectedId(1);
-    oscMenu.addListener(this);
+    osc1Menu.setComponentID("osc1");
+    osc1Menu.setJustificationType(Justification::centred);
+    osc1Menu.setSelectedId(1);
+    osc1Menu.addListener(this);
 
-    oscLabel.setText ("waveform", dontSendNotification);
-    oscLabel.setFont(Font(16));
-    oscLabel.setJustificationType(Justification::left);
-    oscLabel.attachToComponent(&oscMenu, true);
+    // osc1Label.setText ("waveform", dontSendNotification);
+    // osc1Label.setFont(Font(16));
+    // osc1Label.setJustificationType(Justification::left);
+    // osc1Label.attachToComponent(&osc1Menu, true);
 
     //Add to editor
-    addAndMakeVisible(&oscMenu);
-    oscMenuAttachment = std::make_unique<AudioProcessorValueTreeState::ComboBoxAttachment>(processor.tree, "wavetype", oscMenu);
+    addAndMakeVisible(&osc1Menu);
+    osc1MenuAttachment = std::make_unique<AudioProcessorValueTreeState::ComboBoxAttachment>(processor.tree, "wavetype1", osc1Menu);
 
-    oscModel.updateWave(oscMenu.getSelectedId());
-    addAndMakeVisible(&oscModel);
+    osc1Model.updateWave(osc1Menu.getSelectedId());
+    addAndMakeVisible(&osc1Model);
+
+    osc2Menu.addItem("Sine", 1);
+    osc2Menu.addItem("Triangle", 2);
+    osc2Menu.addItem("Saw", 3);
+    osc2Menu.addItem("Square", 4);
+
+    osc2Menu.setComponentID("osc2");
+    osc2Menu.setJustificationType(Justification::centred);
+    osc2Menu.setSelectedId(1);
+    osc2Menu.addListener(this);
+
+    //Add to editor
+    addAndMakeVisible(&osc2Menu);
+    osc2MenuAttachment = std::make_unique<AudioProcessorValueTreeState::ComboBoxAttachment>(processor.tree, "wavetype2", osc2Menu);
+
+    osc2Model.updateWave(osc2Menu.getSelectedId());
+    addAndMakeVisible(&osc2Model);
+
+    oscLabel.setText ("Oscillators", dontSendNotification);
+    oscLabel.setFont(Font(16));
+    oscLabel.setJustificationType(Justification::centred);
+    addAndMakeVisible(&oscLabel);
+
+    //blendKnob config
+    blendKnob.setLookAndFeel(&customLookAndFeel);
+    blendKnob.setSliderStyle(Slider::RotaryVerticalDrag);
+    blendKnob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
+    blendKnob.setSize(getWidth()/4,72);
+    blendLabel.setText ("Blend", dontSendNotification);
+    blendLabel.setFont(Font(10));
+    blendLabel.setJustificationType(Justification::centred);
+    blendLabel.attachToComponent(&blendKnob, false);
+    addAndMakeVisible(&blendKnob);
+    blendKnob.addListener(this);
+    blendAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.tree, "blend", blendKnob);
+    blendKnob.setNumDecimalPlacesToDisplay(2);
 }
 
 Oscillator::~Oscillator()
 {
+}
+
+float Oscillator::getBlend()
+{
+    return blendKnob.getValue();
 }
 
 void Oscillator::paint (Graphics& g)
@@ -59,12 +101,27 @@ void Oscillator::resized()
     // components that your component contains..
 
     Rectangle<int> area = getLocalBounds().reduced(border);
-    oscMenu.setBounds(area.removeFromTop(25).removeFromRight(150));
+    Rectangle<int> menus = area.removeFromTop(25);
+    osc1Menu.setBounds(menus.removeFromLeft(160));
+    oscLabel.setBounds(menus.removeFromLeft(144));
+    osc2Menu.setBounds(menus.removeFromLeft(160));
     area.removeFromTop(10);
-    oscModel.setBounds(area);
+    osc1Model.setBounds(area.removeFromLeft(160));
+    blendKnob.setBounds(area.removeFromLeft(144));
+    osc2Model.setBounds(area);
 }
 
 void Oscillator::comboBoxChanged(ComboBox* combo)
 {
-    oscModel.updateWave(combo->getSelectedId());
+    String id = combo->getComponentID();
+    if (id == "osc1") {
+        osc1Model.updateWave(combo->getSelectedId());
+    } else {
+        osc2Model.updateWave(combo->getSelectedId());
+    }
+}
+
+void Oscillator::sliderValueChanged(Slider* slider)
+{
+
 }
