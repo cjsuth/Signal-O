@@ -14,6 +14,7 @@
 #include "PluginProcessor.h"
 #include "OscModel.h"
 #include "CustomLookAndFeel.h"
+#include "Knobs.h"
 
 //==============================================================================
 /*
@@ -28,7 +29,6 @@ public:
     void resized() override;
     void comboBoxChanged(ComboBox *) override;
     void sliderValueChanged(Slider *slider) override;
-    float getBlend();
 
   private:
     const int border = 8;
@@ -43,11 +43,23 @@ public:
 
     Label oscLabel;
 
-    Slider blendKnob;
-    Label blendLabel;
+    DBKnob level1Knob;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> level1Attachment;
+    
+    DBKnob level2Knob;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> level2Attachment;
+    
+    Slider freq1Knob;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> freq1Attachment;
+    
+    Slider freq2Knob;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> freq2Attachment;
+    
+    Label levelLabel;
+    Label freqLabel;
+
 
     std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> osc1MenuAttachment;
     std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> osc2MenuAttachment;
-    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> blendAttachment;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Oscillator)
 };

@@ -36,40 +36,40 @@ tree (*this, nullptr, "PARAMETERS", createParameterLayout())
     mySynth.addSound(new SynthSound());
 }
 
-//converting from real attack value to decimal between 0 and 1
-float customConvertTo0To1Func(float rangeStart, float rangeEnd, float valueToRemap)
-{
+// //converting from real attack value to decimal between 0 and 1
+// float customConvertTo0To1Func(float rangeStart, float rangeEnd, float valueToRemap)
+// {
 
-//     const midpoint;
+// //     const midpoint;
 
-//     auto proportion = (valueToRemap - rangeStart) / (rangeEnd - rangeStart);
-//     auto clampedProportion = jlimit(0.0f, 1.0f, proportion);
+// //     auto proportion = (valueToRemap - rangeStart) / (rangeEnd - rangeStart);
+// //     auto clampedProportion = jlimit(0.0f, 1.0f, proportion);
 
-//     if (clampedProportion < .5)
-//     {
-//         return
-//    }
+// //     if (clampedProportion < .5)
+// //     {
+// //         return
+// //    }
 
-//    auto skew = std::log (.5) / std::log ((midpoint - min) / (max - min));
-//    return std::pow (clampedProportion, skew);
-    return 1;
-}
+// //    auto skew = std::log (.5) / std::log ((midpoint - min) / (max - min));
+// //    return std::pow (clampedProportion, skew);
+//     return 1;
+// }
 
-//converting from a decimal between 0 and 1 to a real attack value
-float customConvertFrom0To1Func(float rangeStart, float rangeEnd, float valueToRemap)
-{
+// //converting from a decimal between 0 and 1 to a real attack value
+// float customConvertFrom0To1Func(float rangeStart, float rangeEnd, float valueToRemap)
+// {
 
-    float firstMax = 100.0f;
+//     float firstMax = 100.0f;
 
-    if (valueToRemap <= .5) {
-        return rangeStart + (firstMax - rangeStart) * valueToRemap;
-    } else {
-        auto skew = std::log (.5) / std::log ((50.0f - rangeStart) / (rangeEnd - rangeStart));
-        auto skewedProportion = std::exp (std::log (valueToRemap) / skew);
+//     if (valueToRemap <= .5) {
+//         return rangeStart + (firstMax - rangeStart) * valueToRemap;
+//     } else {
+//         auto skew = std::log (.5) / std::log ((50.0f - rangeStart) / (rangeEnd - rangeStart));
+//         auto skewedProportion = std::exp (std::log (valueToRemap) / skew);
 
-        return rangeStart + (rangeEnd - rangeStart) * skewedProportion;
-    }
-}
+//         return rangeStart + (rangeEnd - rangeStart) * skewedProportion;
+//     }
+// }
 
 AudioProcessorValueTreeState::ParameterLayout BasicSynthAudioProcessor::createParameterLayout()
 {
@@ -80,19 +80,13 @@ AudioProcessorValueTreeState::ParameterLayout BasicSynthAudioProcessor::createPa
     attackRange.setSkewForCentre(50.0);
     auto attackParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
                         ("attack", "Attack", "Attack", attackRange, 0.0f, nullptr, nullptr);
-                        
-
     NormalisableRange<float> decayRange(0, 60000.0f);
     decayRange.setSkewForCentre(300.0);
     auto decayParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
                         ("decay", "Decay", "Decay", decayRange, 600.0f, nullptr, nullptr);
-                        
-
     NormalisableRange<float> sustainRange(0, 1.0f, .01f, 1);
     auto sustainParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
                         ("sustain", "Sustain", "Sustain", sustainRange, 1.0, nullptr, nullptr);
-                        
-
     NormalisableRange<float> releaseRange(0, 60000.0f);
     releaseRange.setSkewForCentre(300.0);                    
     auto releaseParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
@@ -103,17 +97,22 @@ AudioProcessorValueTreeState::ParameterLayout BasicSynthAudioProcessor::createPa
                             ("wavetype1", "Wavetype1", "Wavetype1", NormalisableRange<float>(1, 4), 1, nullptr, nullptr);
     auto wavetype2Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
                             ("wavetype2", "Wavetype2", "Wavetype2", NormalisableRange<float>(1, 4), 1, nullptr, nullptr);    
-    auto blendParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
-                            ("blend", "Blend", "Blend", NormalisableRange<float>(0.0f, 1.0f), 0.0f, nullptr, nullptr);                              
+    auto level1Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                            ("level1", "Level1", "Level1", NormalisableRange<float>(0.0f, 1.0f), 0.3f, nullptr, nullptr);   
+    auto level2Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                            ("level2", "Level2", "Level2", NormalisableRange<float>(0.0f, 1.0f), 0.3f, nullptr, nullptr);                                                       
+    auto freq1Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                            ("freq1", "Freq1", "Freq1", NormalisableRange<float>(1.0, 48.0f, 1.0f), 1.0f, nullptr, nullptr);   
+    auto freq2Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                            ("freq2", "Freq2", "Freq2", NormalisableRange<float>(1.0, 48.0f, 1.0f), 1.0f, nullptr, nullptr);                                                       
+
 
     auto filtertypeParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
                             ("filterType", "Filtertype", "Filtertype", NormalisableRange<float>(0.0f, 2.0f), 0.0f, nullptr, nullptr);
-
     NormalisableRange<float> cutoffRange(20.0f, 10000.0f);
     cutoffRange.setSkewForCentre(1000.0);                          
     auto cutoffParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
                             ("filterCutoff", "Cutoff", "Cutoff", cutoffRange, 400.0f, nullptr, nullptr);
-                            
     auto resParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
                             ("filterRes", "Res", "Res", NormalisableRange<float>(1.0f, 5.0f), 1.0f, nullptr, nullptr);
 
@@ -124,7 +123,10 @@ AudioProcessorValueTreeState::ParameterLayout BasicSynthAudioProcessor::createPa
     layout.push_back(std::move(releaseParam));
     layout.push_back(std::move(wavetype1Param));
     layout.push_back(std::move(wavetype2Param));
-    layout.push_back(std::move(blendParam));
+    layout.push_back(std::move(level1Param));
+    layout.push_back(std::move(level2Param));
+    layout.push_back(std::move(freq1Param));
+    layout.push_back(std::move(freq2Param));
     layout.push_back(std::move(filtertypeParam));
     layout.push_back(std::move(cutoffParam));
     layout.push_back(std::move(resParam));
@@ -274,7 +276,10 @@ void BasicSynthAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuf
             
             myVoice->getWavetypeParams(tree.getRawParameterValue("wavetype1"),
                                        tree.getRawParameterValue("wavetype2"),
-                                       tree.getRawParameterValue("blend"));
+                                       tree.getRawParameterValue("level1"),
+                                       tree.getRawParameterValue("level2"),
+                                       tree.getRawParameterValue("freq1"),
+                                       tree.getRawParameterValue("freq2"));
             
             myVoice->getFilterParams(tree.getRawParameterValue("filterType"),
                                      tree.getRawParameterValue("filterCutoff"),

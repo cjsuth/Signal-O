@@ -58,33 +58,66 @@ Oscillator::Oscillator(BasicSynthAudioProcessor& p) :
     addAndMakeVisible(&osc2Model);
 
     oscLabel.setText ("Oscillators", dontSendNotification);
-    oscLabel.setFont(Font(16));
     oscLabel.setJustificationType(Justification::centred);
     addAndMakeVisible(&oscLabel);
 
-    //blendKnob config
-    blendKnob.setLookAndFeel(&customLookAndFeel);
-    blendKnob.setSliderStyle(Slider::RotaryVerticalDrag);
-    blendKnob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
-    blendKnob.setSize(getWidth()/4,72);
-    blendLabel.setText ("Blend", dontSendNotification);
-    blendLabel.setFont(Font(10));
-    blendLabel.setJustificationType(Justification::centred);
-    blendLabel.attachToComponent(&blendKnob, false);
-    addAndMakeVisible(&blendKnob);
-    blendKnob.addListener(this);
-    blendAttachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.tree, "blend", blendKnob);
-    blendKnob.setNumDecimalPlacesToDisplay(2);
+    //level1Knob config
+    level1Knob.setLookAndFeel(&customLookAndFeel);
+    level1Knob.setSliderStyle(Slider::RotaryVerticalDrag);
+    level1Knob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
+    // level1Knob.setSize(getWidth()/4,72);
+    addAndMakeVisible(&level1Knob);
+    level1Knob.addListener(this);
+    level1Attachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.tree, "level1", level1Knob);
+    level1Knob.setNumDecimalPlacesToDisplay(2);
+
+    //level2Knob config
+    level2Knob.setLookAndFeel(&customLookAndFeel);
+    level2Knob.setSliderStyle(Slider::RotaryVerticalDrag);
+    level2Knob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
+    // level2Knob.setSize(getWidth()/4,72);
+    addAndMakeVisible(&level2Knob);
+    level2Knob.addListener(this);
+    level2Attachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.tree, "level2", level2Knob);
+    level2Knob.setNumDecimalPlacesToDisplay(2);
+
+    //freq2Knob config
+    freq1Knob.setLookAndFeel(&customLookAndFeel);
+    freq1Knob.setSliderStyle(Slider::RotaryVerticalDrag);
+    freq1Knob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
+    // freq1Knob.setSize(getWidth()/4,72);
+    addAndMakeVisible(&freq1Knob);
+    freq1Knob.addListener(this);
+    freq1Attachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.tree, "freq1", freq1Knob);
+    freq1Knob.setNumDecimalPlacesToDisplay(1);
+
+    //freq2Knob config
+    freq2Knob.setLookAndFeel(&customLookAndFeel);
+    freq2Knob.setSliderStyle(Slider::RotaryVerticalDrag);
+    freq2Knob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
+    // freq2Knob.setSize(getWidth()/4,72);
+    addAndMakeVisible(&freq2Knob);
+    freq2Knob.addListener(this);
+    freq2Attachment = std::make_unique<AudioProcessorValueTreeState::SliderAttachment>(processor.tree, "freq2", freq2Knob);
+    freq2Knob.setNumDecimalPlacesToDisplay(1);
+
+
+
+    freqLabel.setText ("Freq", dontSendNotification);
+    freqLabel.setFont(Font(10));
+    freqLabel.setJustificationType(Justification::centred);
+    addAndMakeVisible(&freqLabel);
+
+    levelLabel.setText ("Level", dontSendNotification);
+    levelLabel.setFont(Font(10));
+    levelLabel.setJustificationType(Justification::centred);
+    addAndMakeVisible(&levelLabel);
 }
 
 Oscillator::~Oscillator()
 {
 }
 
-float Oscillator::getBlend()
-{
-    return blendKnob.getValue();
-}
 
 void Oscillator::paint (Graphics& g)
 {
@@ -107,8 +140,16 @@ void Oscillator::resized()
     osc2Menu.setBounds(menus.removeFromLeft(160));
     area.removeFromTop(10);
     osc1Model.setBounds(area.removeFromLeft(160));
-    blendKnob.setBounds(area.removeFromLeft(144));
-    osc2Model.setBounds(area);
+    osc2Model.setBounds(area.removeFromRight(160));
+
+    Rectangle<int> top = area.removeFromTop(area.getHeight() / 2);
+    freq1Knob.setBounds(top.removeFromLeft((top.getWidth()-30) / 2));
+    freqLabel.setBounds(top.removeFromLeft(30));
+    freq2Knob.setBounds(top);
+
+    level1Knob.setBounds(area.removeFromLeft((area.getWidth()-30) / 2));
+    levelLabel.setBounds(area.removeFromLeft(30));
+    level2Knob.setBounds(area);
 }
 
 void Oscillator::comboBoxChanged(ComboBox* combo)

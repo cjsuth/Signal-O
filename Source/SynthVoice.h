@@ -30,11 +30,19 @@ public:
         
     }
     
-    void getWavetypeParams(std::atomic<float>* wave1, std::atomic<float>* wave2, std::atomic<float>* blend)
+    void getWavetypeParams(std::atomic<float>* wave1, 
+                            std::atomic<float>* wave2, 
+                            std::atomic<float>* l1, 
+                            std::atomic<float>* l2,
+                            std::atomic<float>* f1,
+                            std::atomic<float>* f2)
     {
         wavetype1 = (int)*wave1;
         wavetype2 = (int)*wave2;
-        oscBlend = *blend;
+        level1 = *l1;
+        level2 = *l2;
+        freq1 = *f1;
+        freq2 = *f2;
     }
     
     void getFilterParams (std::atomic<float>* filterType, std::atomic<float>* filterCutoff, std::atomic<float>* filterRes)
@@ -66,23 +74,23 @@ public:
         
         switch (wavetype1)
         {
-            case 1: sample1 = osc1.sinewave(frequency); break;
-            case 2: sample1 = osc1.triangle(frequency); break;
-            case 3: sample1 = osc1.saw(frequency); break;
-            case 4: sample1 = osc1.square(frequency); break;
-            default: sample1 = osc1.sinewave(frequency);
+            case 1: sample1 = osc1.sinewave(frequency * freq1); break;
+            case 2: sample1 = osc1.triangle(frequency * freq1); break;
+            case 3: sample1 = osc1.saw(frequency * freq1); break;
+            case 4: sample1 = osc1.square(frequency * freq1); break;
+            default: sample1 = osc1.sinewave(frequency * freq1);
         }
         
         switch (wavetype2)
         {
-            case 1: sample2 = osc2.sinewave(frequency / 2.0); break;
-            case 2: sample2 = osc2.triangle(frequency / 2.0); break;
-            case 3: sample2 = osc2.saw(frequency / 2.0); break;
-            case 4: sample2 = osc2.square(frequency / 2.0); break;
-            default: sample2 = osc2.sinewave(frequency / 2.0);
+            case 1: sample2 = osc2.sinewave(frequency * freq2); break;
+            case 2: sample2 = osc2.triangle(frequency * freq2); break;
+            case 3: sample2 = osc2.saw(frequency * freq2); break;
+            case 4: sample2 = osc2.square(frequency * freq2); break;
+            default: sample2 = osc2.sinewave(frequency * freq2);
         }
         
-        return sample1 + oscBlend * sample2;
+        return (sample1 * level1) + (sample2 * level2);
     }
 
     double setEnvelope()
@@ -113,18 +121,15 @@ public:
         
     }
 private:
-    double level;
-    double frequency;
-    int wavetype1;
-    int wavetype2;
-    float oscBlend;
+    double level, frequency;
+
+    int wavetype1, wavetype2;
+    float level1, level2, freq1, freq2;
 
     int filterChoice;
-    float cutoff;
-    float res;
-    
-    maxiOsc osc1;
-    maxiOsc osc2;
+    float cutoff, res;
+
+    maxiOsc osc1, osc2;
     maxiEnv env1;
     maxiFilter filter1;
 };
