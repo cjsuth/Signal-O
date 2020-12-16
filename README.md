@@ -5,4 +5,5 @@ Signal O is a single oscillator VST synthesizer created with the JUCE library fo
 # Coming soon
 
 gain knob
+
 LFO for pitch and filter modulation
