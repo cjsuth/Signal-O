@@ -94,17 +94,17 @@ AudioProcessorValueTreeState::ParameterLayout BasicSynthAudioProcessor::createPa
     
 
     auto wavetype1Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
-                            ("wavetype1", "Wavetype1", "Wavetype1", NormalisableRange<float>(1, 4), 1, nullptr, nullptr);
+                            ("osc1wavetype", "Wavetype1", "Wavetype1", NormalisableRange<float>(1, 4), 1, nullptr, nullptr);
     auto wavetype2Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
-                            ("wavetype2", "Wavetype2", "Wavetype2", NormalisableRange<float>(1, 4), 1, nullptr, nullptr);    
+                            ("osc2wavetype", "Wavetype2", "Wavetype2", NormalisableRange<float>(1, 4), 1, nullptr, nullptr);    
     auto level1Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
-                            ("level1", "Level1", "Level1", NormalisableRange<float>(0.0f, 1.0f), 0.3f, nullptr, nullptr);   
+                            ("osc1level", "Level1", "Level1", NormalisableRange<float>(0.0f, 1.0f), 0.3f, nullptr, nullptr);   
     auto level2Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
-                            ("level2", "Level2", "Level2", NormalisableRange<float>(0.0f, 1.0f), 0.3f, nullptr, nullptr);                                                       
-    auto freq1Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
-                            ("freq1", "Freq1", "Freq1", NormalisableRange<float>(1.0, 48.0f, 1.0f), 1.0f, nullptr, nullptr);   
-    auto freq2Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
-                            ("freq2", "Freq2", "Freq2", NormalisableRange<float>(1.0, 48.0f, 1.0f), 1.0f, nullptr, nullptr);                                                       
+                            ("osc2level", "Level2", "Level2", NormalisableRange<float>(0.0f, 1.0f), 0.3f, nullptr, nullptr);                                                       
+    auto octave1Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                            ("osc1octave", "Octave1", "Octave1", NormalisableRange<float>(-3.0f, 3.0f, 1.0f), 0.0f, nullptr, nullptr);   
+    auto octave2Param = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
+                            ("osc2octave", "Octave2", "Octave2", NormalisableRange<float>(-3.0f, 3.0f, 1.0f), 0.0f, nullptr, nullptr);                                                       
 
 
     auto filtertypeParam = std::make_unique<juce::AudioProcessorValueTreeState::Parameter> 
@@ -125,8 +125,8 @@ AudioProcessorValueTreeState::ParameterLayout BasicSynthAudioProcessor::createPa
     layout.push_back(std::move(wavetype2Param));
     layout.push_back(std::move(level1Param));
     layout.push_back(std::move(level2Param));
-    layout.push_back(std::move(freq1Param));
-    layout.push_back(std::move(freq2Param));
+    layout.push_back(std::move(octave1Param));
+    layout.push_back(std::move(octave2Param));
     layout.push_back(std::move(filtertypeParam));
     layout.push_back(std::move(cutoffParam));
     layout.push_back(std::move(resParam));
@@ -274,12 +274,12 @@ void BasicSynthAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuf
                                      tree.getRawParameterValue("sustain"),
                                      tree.getRawParameterValue("release"));
             
-            myVoice->getWavetypeParams(tree.getRawParameterValue("wavetype1"),
-                                       tree.getRawParameterValue("wavetype2"),
-                                       tree.getRawParameterValue("level1"),
-                                       tree.getRawParameterValue("level2"),
-                                       tree.getRawParameterValue("freq1"),
-                                       tree.getRawParameterValue("freq2"));
+            myVoice->getWavetypeParams(tree.getRawParameterValue("osc1wavetype"),
+                                       tree.getRawParameterValue("osc2wavetype"),
+                                       tree.getRawParameterValue("osc1level"),
+                                       tree.getRawParameterValue("osc2level"),
+                                       tree.getRawParameterValue("osc1octave"),
+                                       tree.getRawParameterValue("osc2octave"));
             
             myVoice->getFilterParams(tree.getRawParameterValue("filterType"),
                                      tree.getRawParameterValue("filterCutoff"),

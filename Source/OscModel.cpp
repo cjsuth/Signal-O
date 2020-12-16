@@ -56,8 +56,8 @@ void OscModel::drawSine(Graphics &g) {
     Point<float> end = Point<float>(width - border, height / 2);
     Point<float> mid = Point<float>((width/2), height / 2);
     Point<float> mid1((end.getX() + (3 * start.getX())) / 4, 
-                      end.getY() - 70);
-    Point<float> mid2(((3 * end.getX()) + start.getX()) / 4, end.getY() + 70);
+                      end.getY() - 50);
+    Point<float> mid2(((3 * end.getX()) + start.getX()) / 4, end.getY() + 50);
     Path sinePath = Path();
     sinePath.startNewSubPath(start);
     sinePath.quadraticTo(mid1, mid);

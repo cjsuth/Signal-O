@@ -16,7 +16,7 @@ Filter::Filter(BasicSynthAudioProcessor& p) :
     processor(p)//, envModel(0,0,0,0)
 {
     setOpaque (true);
-    setSize(240, 160);
+    setSize(240, 130);
     
     //filtermenu config
     filterMenu.addItem("Low Pass", 1);
@@ -24,7 +24,7 @@ Filter::Filter(BasicSynthAudioProcessor& p) :
     filterMenu.addItem("Band Pass", 3);
     filterMenu.setJustificationType(Justification::centred);
     filterMenu.setSelectedId(1);
-    filterLabel.setText ("filter", dontSendNotification);
+    filterLabel.setText ("Filter", dontSendNotification);
     filterLabel.setFont(Font(16));
     filterLabel.setJustificationType(Justification::left);
     filterLabel.attachToComponent(&filterMenu, true);
@@ -35,7 +35,6 @@ Filter::Filter(BasicSynthAudioProcessor& p) :
     cutoffKnob.setLookAndFeel(&customLookAndFeel);
     cutoffKnob.setSliderStyle(Slider::RotaryVerticalDrag);
     cutoffKnob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
-    cutoffKnob.setSize(getWidth()/4,ctrlBoxHeight-border);
     cutoffLabel.setText ("Cutoff", dontSendNotification);
     cutoffLabel.setFont(Font(10));
     cutoffLabel.setJustificationType(Justification::centred);
@@ -49,7 +48,6 @@ Filter::Filter(BasicSynthAudioProcessor& p) :
     resKnob.setLookAndFeel(&customLookAndFeel);
     resKnob.setSliderStyle(Slider::RotaryVerticalDrag);
     resKnob.setTextBoxStyle(Slider::TextBoxBelow, false, 50, 20);
-    resKnob.setSize(getWidth()/4,ctrlBoxHeight-border);
     resLabel.setText ("Res", dontSendNotification);
     resLabel.setFont(Font(10));
     resLabel.setJustificationType(Justification::centred);
@@ -91,18 +89,15 @@ void Filter::paint (Graphics& g)
 
 void Filter::resized()
 {
-
     Rectangle<int> area = getLocalBounds().reduced(border);
-    int childWidth = area.getWidth() / 2;
+    filterMenu.setBounds(area.removeFromTop(30).removeFromRight(180));
 
-    filterMenu.setBounds(area.removeFromTop(25).removeFromRight(180));
-    area.removeFromTop(30);
-
-    cutoffKnob.setBounds(area.removeFromLeft(childWidth).removeFromRight(childWidth-30));
-    resKnob.setBounds(area.removeFromLeft(childWidth-30));
+    auto knobWidth = area.getWidth() / 3;
+    area.removeFromTop(15);
+    cutoffKnob.setBounds(area.removeFromLeft(knobWidth).reduced(4));
+    resKnob.setBounds(area.removeFromLeft(knobWidth).reduced(4));
 }
 
 void Filter::sliderValueChanged(Slider* slider)
 {
-    //envModel.updateNodes(getAttack(), getDecay(), getSustain(), getRelease());
 }

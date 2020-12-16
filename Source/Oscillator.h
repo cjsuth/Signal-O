@@ -22,7 +22,7 @@
 class Oscillator    : public Component, ComboBox::Listener, Slider::Listener
 {
 public:
-    Oscillator(BasicSynthAudioProcessor&);
+    Oscillator(BasicSynthAudioProcessor&, String name);
     ~Oscillator();
 
     void paint (Graphics&) override;
@@ -35,31 +35,18 @@ public:
     BasicSynthAudioProcessor& processor;
     CustomLookAndFeel customLookAndFeel;
 
-    ComboBox osc1Menu;
-    OscModel osc1Model;
-
-    ComboBox osc2Menu;
-    OscModel osc2Model;
-
+    ComboBox oscMenu;
     Label oscLabel;
+    OscModel oscModel;
+    std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> menuAttachment;
 
-    DBKnob level1Knob;
-    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> level1Attachment;
-    
-    DBKnob level2Knob;
-    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> level2Attachment;
-    
-    Slider freq1Knob;
-    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> freq1Attachment;
-    
-    Slider freq2Knob;
-    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> freq2Attachment;
-    
+    DBKnob levelKnob;
     Label levelLabel;
-    Label freqLabel;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> levelAttachment;
+    
+    Slider octaveKnob;
+    Label octaveLabel;
+    std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment> octaveAttachment;
 
-
-    std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> osc1MenuAttachment;
-    std::unique_ptr<AudioProcessorValueTreeState::ComboBoxAttachment> osc2MenuAttachment;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Oscillator)
 };

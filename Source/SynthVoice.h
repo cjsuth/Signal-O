@@ -34,15 +34,15 @@ public:
                             std::atomic<float>* wave2, 
                             std::atomic<float>* l1, 
                             std::atomic<float>* l2,
-                            std::atomic<float>* f1,
-                            std::atomic<float>* f2)
+                            std::atomic<float>* o1,
+                            std::atomic<float>* o2)
     {
         wavetype1 = (int)*wave1;
         wavetype2 = (int)*wave2;
         level1 = *l1;
         level2 = *l2;
-        freq1 = *f1;
-        freq2 = *f2;
+        octave1 = *o1;
+        octave2 = *o2;
     }
     
     void getFilterParams (std::atomic<float>* filterType, std::atomic<float>* filterCutoff, std::atomic<float>* filterRes)
@@ -71,23 +71,26 @@ public:
     double setOscType()
     {
         double sample1, sample2;
+
+        double shiftedFreq1 = frequency * pow(2, octave1);
+        double shiftedFreq2 = frequency * pow(2, octave2);
         
         switch (wavetype1)
         {
-            case 1: sample1 = osc1.sinewave(frequency * freq1); break;
-            case 2: sample1 = osc1.triangle(frequency * freq1); break;
-            case 3: sample1 = osc1.saw(frequency * freq1); break;
-            case 4: sample1 = osc1.square(frequency * freq1); break;
-            default: sample1 = osc1.sinewave(frequency * freq1);
+            case 1: sample1 = osc1.sinewave(shiftedFreq1); break;
+            case 2: sample1 = osc1.triangle(shiftedFreq1); break;
+            case 3: sample1 = osc1.saw(shiftedFreq1); break;
+            case 4: sample1 = osc1.square(shiftedFreq1); break;
+            default: sample1 = osc1.sinewave(shiftedFreq1);
         }
         
         switch (wavetype2)
         {
-            case 1: sample2 = osc2.sinewave(frequency * freq2); break;
-            case 2: sample2 = osc2.triangle(frequency * freq2); break;
-            case 3: sample2 = osc2.saw(frequency * freq2); break;
-            case 4: sample2 = osc2.square(frequency * freq2); break;
-            default: sample2 = osc2.sinewave(frequency * freq2);
+            case 1: sample2 = osc2.sinewave(shiftedFreq2); break;
+            case 2: sample2 = osc2.triangle(shiftedFreq2); break;
+            case 3: sample2 = osc2.saw(shiftedFreq2); break;
+            case 4: sample2 = osc2.square(shiftedFreq2); break;
+            default: sample2 = osc2.sinewave(shiftedFreq2);
         }
         
         return (sample1 * level1) + (sample2 * level2);
@@ -105,7 +108,7 @@ public:
         {  
             for (int channel = 0; channel < outputBuffer.getNumChannels(); ++channel)
             {
-                outputBuffer.addSample(channel, startSample, setEnvelope() * level);
+                outputBuffer.addSample(channel, startSample, setEnvelope() * level); // change to gain
             }
             ++startSample;
         }
@@ -124,7 +127,7 @@ private:
     double level, frequency;
 
     int wavetype1, wavetype2;
-    float level1, level2, freq1, freq2;
+    float level1, level2, octave1, octave2;
 
     int filterChoice;
     float cutoff, res;
