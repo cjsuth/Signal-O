@@ -15,6 +15,7 @@
 #include "Envelope.h"
 #include "Oscillator.h"
 #include "Filter.h"
+#include "Gain.h"
 //==============================================================================
 /**
 */
@@ -35,6 +36,8 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BasicSynthAudioProcessorEditor);
 
     Envelope envGUI;
-    Oscillator oscGUI;
+    Oscillator osc1GUI;
+    Oscillator osc2GUI;
     Filter filterGUI;
+    Gain gainGUI;
 };
